@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>남성 패션 상세페이지 생성기</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0a0a0a;
+      --gray-900: #1a1a1a;
+      --gray-700: #3d3d3d;
+      --gray-500: #767676;
+      --gray-300: #b0b0b0;
+      --gray-200: #d9d9d9;
+      --gray-100: #f0f0f0;
+      --gray-50: #f8f8f8;
+      --white: #ffffff;
+      --accent: #4c6ef5;
+      --accent-light: #e8ecff;
+      --red: #e84118;
+      --green: #2ecc71;
+      --font: 'Noto Sans KR', sans-serif;
+      --radius: 6px;
+      --shadow: 0 2px 12px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+    }
+
+    html, body {
+      height: 100%;
+      font-family: var(--font);
+      background: #f2f3f7;
+      color: var(--black);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── APP HEADER ── */
+    .app-header {
+      background: var(--black);
+      color: white;
+      padding: 0 32px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+    .app-header .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .app-header .logo-icon {
+      width: 36px; height: 36px;
+      background: white;
+      color: var(--black);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing: -1px;
+    }
+    .app-header .logo-text h1 {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+    .app-header .logo-text p {
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 1px;
+    }
+    .app-header .header-badge {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 5px 14px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.8);
+      border-radius: 20px;
+    }
+
+    /* ── LAYOUT ── */
+    .app-body {
+      display: grid;
+      grid-template-columns: 480px 1fr;
+      height: calc(100vh - 64px);
+    }
+
+    /* ── SIDEBAR (FORM) ── */
+    .sidebar {
+      background: var(--white);
+      border-right: 1px solid var(--gray-200);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 4px; }
+
+    /* ── FORM HEADER ── */
+    .form-header {
+      padding: 24px 28px 0;
+      border-bottom: 1px solid var(--gray-100);
+      position: sticky;
+      top: 0;
+      background: var(--white);
+      z-index: 10;
+    }
+    .step-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: -1px;
+    }
+    .step-tab {
+      flex: 1;
+      padding: 12px 8px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--font);
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      color: var(--gray-400, #aaa);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .step-tab .step-num {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--gray-100);
+      color: var(--gray-500);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+    }
+    .step-tab.active {
+      color: var(--black);
+      border-bottom-color: var(--black);
+    }
+    .step-tab.active .step-num {
+      background: var(--black);
+      color: white;
+    }
+    .step-tab.done .step-num {
+      background: var(--green);
+      color: white;
+    }
+
+    /* ── FORM BODY ── */
+    .form-body {
+      padding: 28px;
+      flex: 1;
+    }
+
+    .form-step { display: none; }
+    .form-step.active { display: block; }
+
+    .form-section {
+      margin-bottom: 28px;
+    }
+    .form-section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gray-700);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .form-section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--gray-100);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 6px;
+    }
+    .form-label .required { color: var(--red); margin-left: 3px; }
+    .form-label .hint {
+      font-weight: 400;
+      color: var(--gray-400, #aaa);
+      font-size: 11px;
+      margin-left: 6px;
+    }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-family: var(--font);
+      color: var(--black);
+      background: var(--white);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--black);
+      box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
+    }
+    .form-textarea { resize: vertical; min-height: 100px; line-height: 1.7; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+    /* TAG INPUT */
+    .tag-input-wrap {
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 8px;
+      min-height: 48px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      cursor: text;
+      transition: border-color 0.2s;
+    }
+    .tag-input-wrap:focus-within { border-color: var(--black); }
+    .tag-item {
+      background: var(--black);
+      color: white;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .tag-item button {
+      background: none; border: none; color: white; cursor: pointer;
+      font-size: 14px; line-height: 1; padding: 0;
+    }
+    .tag-input {
+      border: none; outline: none;
+      font-size: 13px; font-family: var(--font);
+      flex: 1; min-width: 100px;
+      padding: 2px 4px;
+    }
+
+    /* CHECKBOX GROUP */
+    .check-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .check-chip {
+      padding: 6px 14px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--gray-700);
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .check-chip:hover { border-color: var(--gray-500); }
+    .check-chip.selected {
+      background: var(--black);
+      color: white;
+      border-color: var(--black);
+    }
+    .check-chip input { display: none; }
+
+    /* UPLOAD ZONE */
+    .upload-zone {
+      border: 2px dashed var(--gray-200);
+      border-radius: var(--radius);
+      padding: 32px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: var(--black);
+      background: var(--gray-50);
+    }
+    .upload-zone input[type="file"] {
+      position: absolute; inset: 0;
+      opacity: 0; cursor: pointer;
+      width: 100%; height: 100%;
+    }
+    .upload-icon { font-size: 32px; margin-bottom: 8px; }
+    .upload-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; color: var(--gray-700); }
+    .upload-sub { font-size: 12px; color: var(--gray-400, #aaa); }
+
+    /* IMAGE PREVIEW GRID */
+    .img-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .img-preview-item {
+      position: relative;
+      aspect-ratio: 3/4;
+      overflow: hidden;
+      border-radius: 4px;
+      background: var(--gray-100);
+    }
+    .img-preview-item img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .img-preview-item .img-del {
+      position: absolute;
+      top: 4px; right: 4px;
+      width: 22px; height: 22px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .img-preview-item:hover .img-del { opacity: 1; }
+    .img-preview-item .img-order {
+      position: absolute;
+      bottom: 4px; left: 4px;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 10px;
+    }
+
+    /* WASHING INSTRUCTIONS */
+    .wash-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .wash-option {
+      padding: 8px 14px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex; align-items: center; gap: 6px;
+      color: var(--gray-700);
+    }
+    .wash-option:hover { border-color: var(--gray-500); }
+    .wash-option.selected {
+      border-color: var(--black);
+      background: var(--black);
+      color: white;
+    }
+    .wash-option input { display: none; }
+
+    /* FORM FOOTER */
+    .form-footer {
+      padding: 20px 28px;
+      border-top: 1px solid var(--gray-100);
+      display: flex;
+      gap: 10px;
+      background: var(--white);
+      position: sticky;
+      bottom: 0;
+    }
+    .btn-prev {
+      padding: 12px 20px;
+      border: 1.5px solid var(--gray-200);
+      background: white;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: var(--font);
+      cursor: pointer;
+      border-radius: var(--radius);
+      color: var(--gray-700);
+      transition: all 0.2s;
+    }
+    .btn-prev:hover { border-color: var(--gray-500); }
+    .btn-next {
+      flex: 1;
+      padding: 12px 20px;
+      background: var(--black);
+      color: white;
+      border: none;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: var(--font);
+      cursor: pointer;
+      border-radius: var(--radius);
+      transition: background 0.2s;
+    }
+    .btn-next:hover { background: var(--gray-900); }
+    .btn-generate {
+      flex: 1;
+      padding: 14px 20px;
+      background: linear-gradient(135deg, #0a0a0a, #3d3d3d);
+      color: white;
+      border: none;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: var(--font);
+      cursor: pointer;
+      border-radius: var(--radius);
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-generate:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
+    .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* ── PREVIEW PANEL ── */
+    .preview-panel {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .preview-toolbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      padding: 0 24px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .preview-toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .preview-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gray-700);
+    }
+    .preview-mode-btns {
+      display: flex;
+      background: var(--gray-100);
+      border-radius: 6px;
+      padding: 3px;
+      gap: 2px;
+    }
+    .mode-btn {
+      padding: 5px 12px;
+      border: none;
+      background: none;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--font);
+      cursor: pointer;
+      border-radius: 4px;
+      color: var(--gray-500);
+      transition: all 0.2s;
+    }
+    .mode-btn.active {
+      background: var(--white);
+      color: var(--black);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+    .preview-toolbar-right {
+      display: flex;
+      gap: 8px;
+    }
+    .toolbar-btn {
+      padding: 7px 16px;
+      border: 1.5px solid var(--gray-200);
+      background: white;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--font);
+      cursor: pointer;
+      border-radius: var(--radius);
+      color: var(--gray-700);
+      display: flex; align-items: center; gap: 6px;
+      transition: all 0.2s;
+    }
+    .toolbar-btn:hover { border-color: var(--black); color: var(--black); }
+    .toolbar-btn.primary {
+      background: var(--black);
+      color: white;
+      border-color: var(--black);
+    }
+    .toolbar-btn.primary:hover { background: var(--gray-900); }
+
+    /* PREVIEW AREA */
+    .preview-area {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+      background: #e8e9ed;
+    }
+
+    .preview-frame-wrap {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 24px;
+      overflow: auto;
+      transition: all 0.3s;
+    }
+    .preview-frame-wrap.mobile-mode {
+      padding: 24px;
+    }
+
+    .preview-browser {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      transition: all 0.3s;
+    }
+    .preview-browser.mobile {
+      width: 390px;
+      min-width: 390px;
+    }
+    .browser-bar {
+      background: #f2f2f2;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    .browser-dots { display: flex; gap: 5px; }
+    .browser-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+    .browser-dot:nth-child(1) { background: #ff5f57; }
+    .browser-dot:nth-child(2) { background: #ffbd2e; }
+    .browser-dot:nth-child(3) { background: #28ca41; }
+    .browser-url {
+      flex: 1;
+      background: white;
+      border-radius: 4px;
+      padding: 5px 12px;
+      font-size: 11px;
+      color: var(--gray-500);
+      border: 1px solid var(--gray-200);
+    }
+
+    .preview-iframe {
+      width: 100%;
+      border: none;
+      min-height: 600px;
+      display: block;
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      color: var(--gray-400, #aaa);
+    }
+    .empty-icon { font-size: 56px; opacity: 0.4; }
+    .empty-title { font-size: 16px; font-weight: 600; color: var(--gray-500); }
+    .empty-sub { font-size: 13px; color: var(--gray-400, #aaa); text-align: center; line-height: 1.8; }
+
+    /* LOADING OVERLAY */
+    .loading-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.9);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      z-index: 100;
+    }
+    .loading-overlay.show { display: flex; }
+    .loading-spinner {
+      width: 44px; height: 44px;
+      border: 3px solid var(--gray-100);
+      border-top-color: var(--black);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 14px; font-weight: 600; color: var(--gray-700); }
+
+    /* NOTIFICATION */
+    .notification {
+      position: fixed;
+      top: 80px;
+      right: 24px;
+      background: var(--black);
+      color: white;
+      padding: 12px 20px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      transform: translateX(120%);
+      transition: transform 0.3s;
+      z-index: 999;
+      max-width: 280px;
+    }
+    .notification.show { transform: translateX(0); }
+    .notification.success { background: #1a1a1a; }
+    .notification.error { background: var(--red); }
+
+    /* PROGRESS BAR */
+    .upload-progress {
+      height: 3px;
+      background: var(--gray-100);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .upload-progress-bar {
+      height: 100%;
+      background: var(--black);
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    /* ── CODE MODAL ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: white;
+      border-radius: 8px;
+      max-width: 900px;
+      width: 100%;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-title { font-size: 16px; font-weight: 700; }
+    .modal-close {
+      background: none; border: none; font-size: 22px;
+      cursor: pointer; color: var(--gray-500); line-height: 1;
+    }
+    .modal-body { padding: 0; flex: 1; overflow: auto; }
+    .code-area {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      font-family: 'Fira Code', 'Consolas', monospace;
+      font-size: 12px;
+      line-height: 1.7;
+      padding: 24px;
+      margin: 0;
+      border: none;
+      resize: none;
+      width: 100%;
+      height: 400px;
+      outline: none;
+    }
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--gray-200);
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 4px; }
+
+    /* RESPONSIVE */
+    @media (max-width: 1100px) {
+      .app-body { grid-template-columns: 420px 1fr; }
+    }
+    @media (max-width: 800px) {
+      .app-body { grid-template-columns: 1fr; grid-template-rows: auto 1fr; height: auto; }
+      .sidebar { height: auto; max-height: 70vh; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- APP HEADER -->
+<header class="app-header">
+  <div class="logo-wrap">
+    <div class="logo-icon">MF</div>
+    <div class="logo-text">
+      <h1>남성 패션 상세페이지 생성기</h1>
+      <p>Men's Fashion Detail Page Builder</p>
+    </div>
+  </div>
+  <div class="header-badge">무신사 · 29CM 스타일</div>
+</header>
+
+<!-- APP BODY -->
+<div class="app-body">
+
+  <!-- ── SIDEBAR FORM ── -->
+  <aside class="sidebar">
+
+    <!-- STEP TABS -->
+    <div class="form-header">
+      <div class="step-tabs">
+        <button class="step-tab active" data-step="1" onclick="goToStep(1)">
+          <span class="step-num">1</span> 기본정보
+        </button>
+        <button class="step-tab" data-step="2" onclick="goToStep(2)">
+          <span class="step-num">2</span> 이미지
+        </button>
+        <button class="step-tab" data-step="3" onclick="goToStep(3)">
+          <span class="step-num">3</span> 스타일
+        </button>
+        <button class="step-tab" data-step="4" onclick="goToStep(4)">
+          <span class="step-num">4</span> 완성
+        </button>
+      </div>
+    </div>
+
+    <!-- FORM BODY -->
+    <div class="form-body">
+
+      <!-- ═══ STEP 1: 기본 정보 ═══ -->
+      <div class="form-step active" id="step-1">
+
+        <div class="form-section">
+          <div class="form-section-title">브랜드 & 상품</div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">브랜드명 <span class="required">*</span></label>
+              <input type="text" class="form-input" id="brandName" placeholder="예: COVERNAT" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">상품번호 <span class="hint">선택</span></label>
+              <input type="text" class="form-input" id="productCode" placeholder="예: CV-001" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">상품명 <span class="required">*</span></label>
+            <input type="text" class="form-input" id="productName" placeholder="예: Heavy Weight Cotton Hoodie" />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">카테고리 <span class="required">*</span></label>
+              <select class="form-select" id="category">
+                <option value="">선택</option>
+                <optgroup label="상의">
+                  <option>티셔츠</option><option>셔츠</option><option>맨투맨</option>
+                  <option>후드티</option><option>니트</option>
+                </optgroup>
+                <optgroup label="아우터">
+                  <option>자켓</option><option>코트</option><option>패딩</option>
+                  <option>블루종</option><option>점퍼</option>
+                </optgroup>
+                <optgroup label="하의">
+                  <option>데님</option><option>슬랙스</option><option>트레이닝</option>
+                  <option>쇼츠</option>
+                </optgroup>
+                <optgroup label="기타">
+                  <option>원피스/세트</option><option>수영복</option>
+                  <option>신발</option><option>가방</option><option>액세서리</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">시즌</label>
+              <select class="form-select" id="season">
+                <option value="">선택</option>
+                <option>SS 2025</option><option>FW 2025</option>
+                <option>SS 2024</option><option>FW 2024</option>
+                <option>SEASON LESS</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">가격</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">판매가 <span class="required">*</span></label>
+              <input type="text" class="form-input" id="price" placeholder="예: 89,000" oninput="formatPrice(this)" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">정가 <span class="hint">할인 시 입력</span></label>
+              <input type="text" class="form-input" id="originalPrice" placeholder="예: 120,000" oninput="formatPrice(this)" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">상품 스펙</div>
+
+          <div class="form-group">
+            <label class="form-label">소재</label>
+            <input type="text" class="form-input" id="material" placeholder="예: 코튼 100% / Cotton 60% Polyester 40%" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">핏</label>
+            <div class="check-group" id="fit-group">
+              <label class="check-chip" onclick="selectFit(this)"><input type="radio" name="fit" value="오버사이즈">오버사이즈</label>
+              <label class="check-chip" onclick="selectFit(this)"><input type="radio" name="fit" value="루즈핏">루즈핏</label>
+              <label class="check-chip" onclick="selectFit(this)"><input type="radio" name="fit" value="레귤러핏">레귤러핏</label>
+              <label class="check-chip" onclick="selectFit(this)"><input type="radio" name="fit" value="슬림핏">슬림핏</label>
+              <label class="check-chip" onclick="selectFit(this)"><input type="radio" name="fit" value="스키니">스키니</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">색상</label>
+            <input type="text" class="form-input" id="color" placeholder="예: Black, Charcoal Gray, Off White" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">사이즈 <span class="hint">다중 선택 가능</span></label>
+            <div class="check-group" id="size-group">
+              <label class="check-chip" onclick="toggleChip(this)"><input type="checkbox" value="XS">XS</label>
+              <label class="check-chip" onclick="toggleChip(this)"><input type="checkbox" value="S">S</label>
+              <label class="check-chip selected" onclick="toggleChip(this)"><input type="checkbox" value="M" checked>M</label>
+              <label class="check-chip selected" onclick="toggleChip(this)"><input type="checkbox" value="L" checked>L</label>
+              <label class="check-chip selected" onclick="toggleChip(this)"><input type="checkbox" value="XL" checked>XL</label>
+              <label class="check-chip" onclick="toggleChip(this)"><input type="checkbox" value="XXL">XXL</label>
+              <label class="check-chip" onclick="toggleChip(this)"><input type="checkbox" value="FREE">FREE</label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ═══ STEP 2: 이미지 ═══ -->
+      <div class="form-step" id="step-2">
+
+        <div class="form-section">
+          <div class="form-section-title">메인 이미지</div>
+          <p style="font-size:12px;color:var(--gray-500);margin-bottom:12px;">상품 슬라이드쇼에 표시되는 대표 이미지입니다. 첫 번째 이미지가 커버가 됩니다.</p>
+          <div class="upload-zone" id="main-upload-zone">
+            <input type="file" id="main-images" accept="image/*" multiple onchange="handleImageUpload('main', this)">
+            <div class="upload-icon">🖼️</div>
+            <div class="upload-title">메인 이미지 업로드</div>
+            <div class="upload-sub">PNG, JPG, WEBP · 최대 20MB · 여러 장 선택 가능<br>권장 비율: 3:4 (세로 이미지)</div>
+          </div>
+          <div class="upload-progress"><div class="upload-progress-bar" id="main-progress"></div></div>
+          <div class="img-preview-grid" id="main-preview"></div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">상세 이미지</div>
+          <p style="font-size:12px;color:var(--gray-500);margin-bottom:12px;">상세페이지 본문에 세로로 나열되는 상세 컷 이미지입니다.</p>
+          <div class="upload-zone" id="detail-upload-zone">
+            <input type="file" id="detail-images" accept="image/*" multiple onchange="handleImageUpload('detail', this)">
+            <div class="upload-icon">📷</div>
+            <div class="upload-title">상세 이미지 업로드</div>
+            <div class="upload-sub">전체 샷, 디테일 컷, 후면 컷 등</div>
+          </div>
+          <div class="upload-progress"><div class="upload-progress-bar" id="detail-progress"></div></div>
+          <div class="img-preview-grid" id="detail-preview"></div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">스타일 이미지 <span style="font-size:11px;font-weight:400;color:var(--gray-400)">선택</span></div>
+          <p style="font-size:12px;color:var(--gray-500);margin-bottom:12px;">착장 컷, 코디 이미지 등 스타일 가이드에 활용되는 이미지입니다.</p>
+          <div class="upload-zone" id="style-upload-zone">
+            <input type="file" id="style-images" accept="image/*" multiple onchange="handleImageUpload('style', this)">
+            <div class="upload-icon">✨</div>
+            <div class="upload-title">스타일 이미지 업로드</div>
+            <div class="upload-sub">착장 컷, 룩북 스타일 이미지</div>
+          </div>
+          <div class="upload-progress"><div class="upload-progress-bar" id="style-progress"></div></div>
+          <div class="img-preview-grid" id="style-preview"></div>
+        </div>
+
+      </div>
+
+      <!-- ═══ STEP 3: 상품 설명 & 스타일링 ═══ -->
+      <div class="form-step" id="step-3">
+
+        <div class="form-section">
+          <div class="form-section-title">상품 설명</div>
+
+          <div class="form-group">
+            <label class="form-label">상품 스토리 <span class="hint">브랜드 감성에 맞는 설명</span></label>
+            <textarea class="form-textarea" id="productDescription" rows="5"
+              placeholder="예: 오버사이즈 실루엣에 내구성이 뛰어난 헤비웨이트 코튼 원단을 사용해&#10;착용감과 보온성 모두를 잡은 계절 대표 아이템.&#10;&#10;미니멀한 그래픽과 시그니처 워싱 가공으로&#10;유니크한 빈티지 무드를 연출합니다."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">스타일 가이드</label>
+            <textarea class="form-textarea" id="styleGuide" rows="4"
+              placeholder="예: 블랙 카고 팬츠와 청키한 워커 부츠로 스트릿 무드를 연출하거나,&#10;슬랙스와 로퍼를 매치해 캐주얼 포멀 룩으로도 활용 가능합니다."></textarea>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">세탁 안내</div>
+          <div class="wash-options">
+            <label class="wash-option" onclick="toggleWash(this)">
+              <input type="checkbox" value="손세탁">🤲 손세탁
+            </label>
+            <label class="wash-option" onclick="toggleWash(this)">
+              <input type="checkbox" value="세탁기 가능">🫧 세탁기 가능
+            </label>
+            <label class="wash-option" onclick="toggleWash(this)">
+              <input type="checkbox" value="드라이클리닝">👔 드라이클리닝
+            </label>
+            <label class="wash-option" onclick="toggleWash(this)">
+              <input type="checkbox" value="표백 금지">🚫 표백 금지
+            </label>
+            <label class="wash-option" onclick="toggleWash(this)">
+              <input type="checkbox" value="건조기 금지">🌬️ 건조기 금지
+            </label>
+            <label class="wash-option" onclick="toggleWash(this)">
+              <input type="checkbox" value="다림질 가능">👕 다림질 가능
+            </label>
+            <label class="wash-option" onclick="toggleWash(this)">
+              <input type="checkbox" value="울 세탁 가능">🧶 울 세탁
+            </label>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">검색 태그</div>
+          <div class="form-group">
+            <label class="form-label">태그 <span class="hint">Enter로 추가</span></label>
+            <div class="tag-input-wrap" id="tag-wrap" onclick="document.getElementById('tag-input').focus()">
+              <input type="text" class="tag-input" id="tag-input" placeholder="태그 입력 후 Enter..."
+                onkeydown="handleTagInput(event)">
+            </div>
+            <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+              <span style="font-size:11px;color:var(--gray-400)">추천:</span>
+              <span onclick="addTagPreset('오버사이즈')" style="font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline">오버사이즈</span>
+              <span onclick="addTagPreset('빈티지')" style="font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline">빈티지</span>
+              <span onclick="addTagPreset('스트릿')" style="font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline">스트릿</span>
+              <span onclick="addTagPreset('캐주얼')" style="font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline">캐주얼</span>
+              <span onclick="addTagPreset('무지')" style="font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline">무지</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ═══ STEP 4: 생성 ═══ -->
+      <div class="form-step" id="step-4">
+
+        <div style="text-align:center;padding:20px 0 24px;">
+          <div style="font-size:48px;margin-bottom:16px;">🎨</div>
+          <div style="font-size:18px;font-weight:700;margin-bottom:8px;">상세페이지를 생성합니다</div>
+          <div style="font-size:13px;color:var(--gray-500);line-height:1.8;">
+            입력하신 정보를 바탕으로<br>
+            무신사 · 29CM 스타일의<br>
+            프리미엄 상세페이지가 생성됩니다.
+          </div>
+        </div>
+
+        <!-- SUMMARY -->
+        <div id="form-summary" style="background:var(--gray-50);border-radius:var(--radius);padding:20px;margin-bottom:24px;">
+          <div style="font-size:12px;font-weight:700;color:var(--gray-700);margin-bottom:12px;">입력 정보 요약</div>
+          <div id="summary-content" style="font-size:13px;color:var(--gray-700);line-height:2;"></div>
+        </div>
+
+        <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:var(--radius);padding:16px;margin-bottom:20px;">
+          <div style="font-size:12px;font-weight:700;color:#f57f17;margin-bottom:6px;">💡 활용 방법</div>
+          <div style="font-size:12px;color:#795548;line-height:1.8;">
+            생성된 HTML 코드를 복사하여 쇼핑몰 상세페이지에 붙여넣기 하거나,
+            파일로 다운로드하여 직접 수정해 사용하세요.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- FORM FOOTER -->
+    <div class="form-footer" id="form-footer">
+      <button class="btn-prev" id="btn-prev" onclick="goPrev()" style="display:none">← 이전</button>
+      <button class="btn-next" id="btn-next" onclick="goNext()">다음 단계 →</button>
+      <button class="btn-generate" id="btn-generate" style="display:none" onclick="generatePage()">
+        ⚡ 상세페이지 생성
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- ── PREVIEW PANEL ── -->
+  <div class="preview-panel">
+
+    <!-- TOOLBAR -->
+    <div class="preview-toolbar">
+      <div class="preview-toolbar-left">
+        <span class="preview-title">미리보기</span>
+        <div class="preview-mode-btns">
+          <button class="mode-btn active" onclick="setMode('desktop', this)">🖥 PC</button>
+          <button class="mode-btn" onclick="setMode('mobile', this)">📱 모바일</button>
+        </div>
+      </div>
+      <div class="preview-toolbar-right">
+        <button class="toolbar-btn" onclick="openCodeModal()" id="code-btn" disabled>
+          &lt;/&gt; HTML 코드
+        </button>
+        <button class="toolbar-btn primary" onclick="downloadHTML()" id="download-btn" disabled>
+          ⬇ 다운로드
+        </button>
+      </div>
+    </div>
+
+    <!-- PREVIEW AREA -->
+    <div class="preview-area">
+      <!-- EMPTY STATE -->
+      <div class="empty-state" id="empty-state">
+        <div class="empty-icon">📐</div>
+        <div class="empty-title">아직 생성된 상세페이지가 없어요</div>
+        <div class="empty-sub">
+          왼쪽 폼에서 상품 정보를 입력하고<br>
+          "상세페이지 생성" 버튼을 클릭하세요
+        </div>
+      </div>
+
+      <!-- PREVIEW BROWSER -->
+      <div class="preview-frame-wrap" id="preview-frame-wrap" style="display:none">
+        <div class="preview-browser" id="preview-browser">
+          <div class="browser-bar">
+            <div class="browser-dots">
+              <div class="browser-dot"></div>
+              <div class="browser-dot"></div>
+              <div class="browser-dot"></div>
+            </div>
+            <div class="browser-url" id="browser-url">상세페이지 미리보기</div>
+          </div>
+          <iframe class="preview-iframe" id="preview-iframe" title="상세페이지 미리보기"></iframe>
+        </div>
+      </div>
+
+      <!-- LOADING -->
+      <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">상세페이지 생성 중...</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── CODE MODAL ── -->
+<div class="modal-overlay" id="code-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">HTML 코드</div>
+      <button class="modal-close" onclick="closeCodeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <textarea class="code-area" id="code-area" readonly spellcheck="false"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="toolbar-btn" onclick="closeCodeModal()">닫기</button>
+      <button class="toolbar-btn" onclick="copyCode()">📋 코드 복사</button>
+      <button class="toolbar-btn primary" onclick="downloadHTML()">⬇ 파일 다운로드</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATION -->
+<div class="notification" id="notification"></div>
+
+<script>
+  // ── STATE ──
+  let currentStep = 1;
+  const totalSteps = 4;
+  let generatedHTML = '';
+  let uploadedImages = { main: [], detail: [], style: [] };
+  let selectedFit = '';
+  const tags = [];
+
+  // ── STEP NAVIGATION ──
+  function goToStep(step) {
+    if (step > currentStep) return; // Only go back
+    currentStep = step;
+    updateStepUI();
+  }
+
+  function goNext() {
+    if (currentStep < totalSteps) {
+      currentStep++;
+      updateStepUI();
+    }
+  }
+
+  function goPrev() {
+    if (currentStep > 1) {
+      currentStep--;
+      updateStepUI();
+    }
+  }
+
+  function updateStepUI() {
+    document.querySelectorAll('.form-step').forEach((el, i) => {
+      el.classList.toggle('active', i + 1 === currentStep);
+    });
+    document.querySelectorAll('.step-tab').forEach((el, i) => {
+      el.classList.remove('active', 'done');
+      if (i + 1 === currentStep) el.classList.add('active');
+      else if (i + 1 < currentStep) el.classList.add('done');
+    });
+
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+    const btnGen = document.getElementById('btn-generate');
+
+    btnPrev.style.display = currentStep > 1 ? 'block' : 'none';
+    btnNext.style.display = currentStep < totalSteps ? 'block' : 'none';
+    btnGen.style.display = currentStep === totalSteps ? 'flex' : 'none';
+
+    if (currentStep === totalSteps) buildSummary();
+    window.scrollTo(0, 0);
+  }
+
+  // ── FORM HELPERS ──
+  function formatPrice(input) {
+    let val = input.value.replace(/[^0-9]/g, '');
+    if (val) val = parseInt(val).toLocaleString('ko-KR');
+    input.value = val;
+  }
+
+  function selectFit(label) {
+    document.querySelectorAll('#fit-group .check-chip').forEach(c => c.classList.remove('selected'));
+    label.classList.add('selected');
+    selectedFit = label.querySelector('input').value;
+  }
+
+  function toggleChip(label) {
+    const cb = label.querySelector('input[type="checkbox"]');
+    cb.checked = !cb.checked;
+    label.classList.toggle('selected', cb.checked);
+  }
+
+  function toggleWash(label) {
+    const cb = label.querySelector('input[type="checkbox"]');
+    cb.checked = !cb.checked;
+    label.classList.toggle('selected', cb.checked);
+  }
+
+  // ── TAGS ──
+  function handleTagInput(e) {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const val = e.target.value.trim().replace(/^#/, '');
+      if (val && !tags.includes(val)) addTag(val);
+      e.target.value = '';
+    } else if (e.key === 'Backspace' && !e.target.value && tags.length > 0) {
+      removeTag(tags.length - 1);
+    }
+  }
+
+  function addTag(val) {
+    tags.push(val);
+    renderTags();
+  }
+
+  function addTagPreset(val) {
+    if (!tags.includes(val)) { addTag(val); }
+  }
+
+  function removeTag(idx) {
+    tags.splice(idx, 1);
+    renderTags();
+  }
+
+  function renderTags() {
+    const wrap = document.getElementById('tag-wrap');
+    const input = document.getElementById('tag-input');
+    wrap.querySelectorAll('.tag-item').forEach(el => el.remove());
+    tags.forEach((t, i) => {
+      const el = document.createElement('span');
+      el.className = 'tag-item';
+      el.innerHTML = `#${t} <button onclick="removeTag(${i})">×</button>`;
+      wrap.insertBefore(el, input);
+    });
+  }
+
+  // ── IMAGE UPLOAD ──
+  function handleImageUpload(type, input) {
+    const files = Array.from(input.files);
+    if (!files.length) return;
+
+    const progress = document.getElementById(type + '-progress');
+    progress.style.width = '10%';
+
+    const formData = new FormData();
+    files.forEach(f => formData.append('images', f));
+
+    const xhr = new XMLHttpRequest();
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) {
+        progress.style.width = Math.round((e.loaded / e.total) * 90) + '%';
+      }
+    };
+    xhr.onload = () => {
+      progress.style.width = '100%';
+      setTimeout(() => { progress.style.width = '0%'; }, 800);
+      if (xhr.status === 200) {
+        const res = JSON.parse(xhr.responseText);
+        uploadedImages[type].push(...res.files);
+        renderPreviews(type);
+        showNotification('이미지가 업로드되었습니다! 📸', 'success');
+      } else {
+        showNotification('업로드 실패. 다시 시도해주세요.', 'error');
+      }
+      input.value = '';
+    };
+    xhr.onerror = () => {
+      progress.style.width = '0%';
+      showNotification('업로드 오류가 발생했습니다.', 'error');
+    };
+    xhr.open('POST', '/api/upload');
+    xhr.send(formData);
+  }
+
+  function renderPreviews(type) {
+    const grid = document.getElementById(type + '-preview');
+    grid.innerHTML = '';
+    uploadedImages[type].forEach((img, i) => {
+      const item = document.createElement('div');
+      item.className = 'img-preview-item';
+      item.innerHTML = `
+        <img src="${img.url}" alt="">
+        <button class="img-del" onclick="removeImage('${type}', ${i})">×</button>
+        <span class="img-order">${i + 1}</span>
+      `;
+      grid.appendChild(item);
+    });
+  }
+
+  function removeImage(type, idx) {
+    const img = uploadedImages[type][idx];
+    if (img && img.filename) {
+      fetch('/api/upload/' + img.filename, { method: 'DELETE' });
+    }
+    uploadedImages[type].splice(idx, 1);
+    renderPreviews(type);
+  }
+
+  // Drag-and-drop
+  ['main-upload-zone', 'detail-upload-zone', 'style-upload-zone'].forEach(id => {
+    const zone = document.getElementById(id);
+    zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('dragover'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+    zone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      zone.classList.remove('dragover');
+      const type = id.replace('-upload-zone', '');
+      const input = zone.querySelector('input[type="file"]');
+      const dataTransfer = new DataTransfer();
+      Array.from(e.dataTransfer.files).forEach(f => dataTransfer.items.add(f));
+      input.files = dataTransfer.files;
+      handleImageUpload(type, input);
+    });
+  });
+
+  // ── SUMMARY ──
+  function buildSummary() {
+    const brandName = document.getElementById('brandName').value;
+    const productName = document.getElementById('productName').value;
+    const price = document.getElementById('price').value;
+    const originalPrice = document.getElementById('originalPrice').value;
+    const category = document.getElementById('category').value;
+    const material = document.getElementById('material').value;
+    const color = document.getElementById('color').value;
+    const sizes = getSelectedSizes();
+
+    let html = '';
+    const addRow = (label, val) => {
+      if (val) html += `<div><strong style="color:var(--gray-500)">${label}:</strong> ${val}</div>`;
+    };
+    addRow('브랜드', brandName || '미입력');
+    addRow('상품명', productName || '미입력');
+    addRow('카테고리', category || '미입력');
+    addRow('판매가', price ? price + '원' : '미입력');
+    if (originalPrice) addRow('정가', originalPrice + '원');
+    addRow('소재', material || '미입력');
+    addRow('색상', color || '미입력');
+    addRow('사이즈', sizes.join(', ') || '미선택');
+    addRow('메인 이미지', uploadedImages.main.length + '장');
+    addRow('상세 이미지', uploadedImages.detail.length + '장');
+    addRow('스타일 이미지', uploadedImages.style.length + '장');
+    if (tags.length) addRow('태그', tags.map(t => '#' + t).join(' '));
+
+    document.getElementById('summary-content').innerHTML = html;
+  }
+
+  function getSelectedSizes() {
+    return Array.from(document.querySelectorAll('#size-group input:checked')).map(cb => cb.value);
+  }
+
+  function getSelectedWashing() {
+    return Array.from(document.querySelectorAll('.wash-option.selected input')).map(cb => ({
+      text: cb.value,
+      icon: cb.closest('.wash-option').textContent.trim().split(' ')[0]
+    }));
+  }
+
+  // ── GENERATE ──
+  async function generatePage() {
+    const btn = document.getElementById('btn-generate');
+    btn.disabled = true;
+    document.getElementById('loading-overlay').classList.add('show');
+    document.getElementById('empty-state').style.display = 'none';
+
+    const data = {
+      brandName: document.getElementById('brandName').value,
+      productName: document.getElementById('productName').value,
+      productCode: document.getElementById('productCode').value,
+      price: document.getElementById('price').value,
+      originalPrice: document.getElementById('originalPrice').value,
+      category: document.getElementById('category').value,
+      season: document.getElementById('season').value,
+      material: document.getElementById('material').value,
+      fit: selectedFit,
+      color: document.getElementById('color').value,
+      sizes: getSelectedSizes(),
+      productDescription: document.getElementById('productDescription').value,
+      styleGuide: document.getElementById('styleGuide').value,
+      washingInstructions: getSelectedWashing(),
+      mainImages: uploadedImages.main,
+      detailImages: uploadedImages.detail,
+      styleImages: uploadedImages.style,
+      tags: tags,
+    };
+
+    try {
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      if (result.success) {
+        generatedHTML = result.html;
+        showPreview(generatedHTML, data);
+        document.getElementById('code-btn').disabled = false;
+        document.getElementById('download-btn').disabled = false;
+        showNotification('상세페이지가 생성되었습니다! 🎉', 'success');
+      }
+    } catch (e) {
+      showNotification('생성 중 오류가 발생했습니다.', 'error');
+    } finally {
+      document.getElementById('loading-overlay').classList.remove('show');
+      btn.disabled = false;
+    }
+  }
+
+  function showPreview(html, data) {
+    document.getElementById('preview-frame-wrap').style.display = 'flex';
+    const iframe = document.getElementById('preview-iframe');
+    const brandName = data.brandName || 'BRAND';
+    const productName = data.productName || '상품명';
+    document.getElementById('browser-url').textContent = `${brandName.toLowerCase()}.com / ${productName.toLowerCase().replace(/\s+/g, '-')}`;
+
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const blobUrl = URL.createObjectURL(blob);
+    iframe.src = blobUrl;
+
+    // Auto-height
+    iframe.onload = () => {
+      try {
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        const h = iframeDoc.body.scrollHeight;
+        iframe.style.height = Math.max(600, h) + 'px';
+      } catch(e) {}
+    };
+
+    document.getElementById('code-area').value = html;
+  }
+
+  // ── MODE ──
+  function setMode(mode, btn) {
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const browser = document.getElementById('preview-browser');
+    if (mode === 'mobile') {
+      browser.classList.add('mobile');
+    } else {
+      browser.classList.remove('mobile');
+    }
+  }
+
+  // ── CODE MODAL ──
+  function openCodeModal() {
+    if (!generatedHTML) return;
+    document.getElementById('code-modal').classList.add('show');
+  }
+  function closeCodeModal() {
+    document.getElementById('code-modal').classList.remove('show');
+  }
+  document.getElementById('code-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeCodeModal();
+  });
+
+  // ── COPY & DOWNLOAD ──
+  function copyCode() {
+    const area = document.getElementById('code-area');
+    area.select();
+    document.execCommand('copy');
+    showNotification('HTML 코드가 복사되었습니다! 📋', 'success');
+  }
+
+  function downloadHTML() {
+    if (!generatedHTML) return;
+    const brandName = document.getElementById('brandName').value || 'brand';
+    const productName = document.getElementById('productName').value || 'product';
+    const filename = `${brandName}-${productName}-detail.html`.toLowerCase().replace(/\s+/g, '-');
+    const blob = new Blob([generatedHTML], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+    showNotification('HTML 파일이 다운로드되었습니다! ⬇', 'success');
+  }
+
+  // ── NOTIFICATION ──
+  function showNotification(msg, type = 'success') {
+    const el = document.getElementById('notification');
+    el.textContent = msg;
+    el.className = 'notification ' + type;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 3000);
+  }
+</script>
+</body>
+</html>
